@@ -13,22 +13,20 @@ if (!MONGODB_URI) {
  * Global type declaration for mongoose connection cache
  * This prevents TypeScript errors when accessing global.mongoose
  */
-declare global {
-  var mongoose: {
-    conn: mongoose.Connection | null;
-    promise: Promise<mongoose.Connection> | null;
-  };
-}
+type MongooseCache = {
+  conn: mongoose.Connection | null;
+  promise: Promise<mongoose.Connection> | null;
+};
 
-/**
- * Cached mongoose connection object
- * In development, Next.js clears Node.js cache on hot reload which can create multiple connections
- * Using a global variable ensures the connection is preserved across hot reloads
- */
-let cached = global.mongoose;
+const globalWithMongooseCache = globalThis as typeof globalThis & {
+  mongooseCache?: MongooseCache;
+};
+
+let cached = globalWithMongooseCache.mongooseCache;
 
 if (!cached) {
-  cached = global.mongoose = { conn: null, promise: null };
+  cached = { conn: null, promise: null };
+  globalWithMongooseCache.mongooseCache = cached;
 }
 
 /**
