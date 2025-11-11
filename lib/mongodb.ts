@@ -6,6 +6,7 @@ type MongooseCache = {
   promise: Promise<typeof mongoose> | null;
 };
 
+<<<<<<< HEAD
 // Extend the global object to include our mongoose cache
 declare global {
   // eslint-disable-next-line no-var
@@ -20,6 +21,26 @@ const cached: MongooseCache = global.mongoose || { conn: null, promise: null };
 
 if (!global.mongoose) {
   global.mongoose = cached;
+=======
+/**
+ * Global type declaration for mongoose connection cache
+ * This prevents TypeScript errors when accessing global.mongoose
+ */
+type MongooseCache = {
+  conn: mongoose.Connection | null;
+  promise: Promise<mongoose.Connection> | null;
+};
+
+const globalWithMongooseCache = globalThis as typeof globalThis & {
+  mongooseCache?: MongooseCache;
+};
+
+let cached = globalWithMongooseCache.mongooseCache;
+
+if (!cached) {
+  cached = { conn: null, promise: null };
+  globalWithMongooseCache.mongooseCache = cached;
+>>>>>>> 8014faf21bce0486c99b27848bbfe5766e6215f0
 }
 
 /**
